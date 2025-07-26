@@ -1,0 +1,398 @@
+/* 基本リセットとフォント設定 */
+:root {
+    --primary-color: #343a40; /* 主要な色を濃いめの灰色に変更 */
+    --secondary-color: #6c757d; /* 補助的な灰色 */
+    --text-color: #333; /* 主要なテキスト色 */
+    --background-color: #f8f9fa; /* 明るい背景色 */
+    --card-background: #ffffff; /* カードの背景色 */
+    --border-color: #e9ecef; /* ボーダーの色 */
+    --code-background: #282c34; /* コードブロックの背景色 */
+    --code-text: #abb2bf; /* コードブロックのテキスト色 */
+    --highlight-green: #28a745; /* 強調用の緑 */
+    --highlight-red: #dc3545; /* 強調用の赤 */
+    --highlight-blue: #007bff; /* 強調用の青 */
+    --highlight-orange: #ffc107; /* 強調用のオレンジ */
+    --nav-width: 250px; /* サイドバーの幅 */
+}
+
+body {
+    font-family: 'Noto Sans JP', sans-serif; /* 日本語フォント優先 */
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* フッターを最下部に固定 */
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px; /* サイドバーと被らないよう左右パディングのみ */
+}
+
+/* ヘッダー */
+header {
+    background-color: var(--primary-color); /* 変更: 濃いめの灰色 */
+    color: #ffffff; /* 変更: テキストカラーを白に */
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    font-weight: 700;
+    display: flex; /* 画像とテキストを横並びにする */
+    align-items: center; /* 垂直方向中央揃え */
+    justify-content: center; /* 水平方向中央揃え */
+}
+
+/* ヘッダーのロゴ画像 */
+.header-logo {
+    height: calc(1.2em * 1.5); /* 変更: タイトルのフォントサイズの1.5倍に */
+    margin-right: 10px; /* タイトルとの間にスペース */
+    vertical-align: middle; /* テキストと画像を中央に揃える */
+}
+
+header p {
+    font-size: 1.1em;
+    font-weight: 300;
+}
+
+/* メインコンテンツとサイドバーのラッパー */
+.content-wrapper {
+    display: flex;
+    flex: 1; /* ヘッダーとフッターの間のスペースを埋める */
+    width: 100%;
+    box-sizing: border-box; /* パディングやボーダーを幅に含める */
+}
+
+/* ナビゲーション (目次) - 固定サイドバー */
+.side-nav {
+    width: var(--nav-width); /* サイドバーの幅 */
+    flex-shrink: 0; /* 幅を固定 */
+    background-color: var(--card-background);
+    padding: 20px 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.08);
+    position: sticky; /* スクロールしても固定 */
+    top: 0; /* スクロール位置の基準 */
+    height: 100vh; /* ビューポートの高さに合わせる */
+    overflow-y: auto; /* 目次が多い場合にスクロールできるように */
+    border-right: 1px solid var(--border-color);
+}
+
+.side-nav h2 {
+    color: var(--primary-color); /* 目次の見出しも変更後のプライマリーカラーに合わせる */
+    font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.side-nav ul {
+    list-style: none; /* リストのマークを削除 */
+    padding: 0;
+    margin: 0;
+}
+
+.side-nav ul li {
+    margin-bottom: 5px;
+}
+
+.side-nav ul li a {
+    display: block; /* クリック領域を広げる */
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 400;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    border-left: 3px solid transparent; /* アクティブなセクションのインジケーター用 */
+    border-bottom: 1px solid var(--border-color); /* 目次項目間のライン */
+}
+
+.side-nav ul li:last-child a {
+    border-bottom: none; /* 最後の項目には下線なし */
+}
+
+.side-nav ul li a:hover {
+    background-color: rgba(var(--primary-color), 0.1); /* 変更後のプライマリーカラーの透明度付き */
+    color: var(--primary-color); /* 変更後のプライマリーカラー */
+    transform: translateX(5px); /* 右に少し移動 */
+    box-shadow: 3px 0 8px rgba(0, 0, 0, 0.1); /* ふわっと浮かび上がる影 */
+    border-left-color: var(--primary-color); /* ホバー時にボーダーを表示 */
+}
+
+/* メインコンテンツ */
+.main-content {
+    flex-grow: 1; /* 残りのスペースを全て占める */
+    padding-left: 20px; /* サイドバーとの間に隙間を作る */
+    padding-right: 20px;
+    padding-top: 20px;
+    padding-bottom: 40px;
+    min-width: 0; /* Flexアイテムの最小幅設定 */
+}
+
+/* 導入文のスタイル */
+.intro-text {
+    background-color: #e6f2ff; /* 明るい青系の背景 */
+    border-left: 5px solid var(--primary-color); /* 変更後のプライマリーカラーに合わせる */
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 5px;
+    line-height: 1.8;
+    font-size: 1.1em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.intro-text .highlight-intro {
+    color: var(--highlight-orange); /* ポップな色 */
+    font-weight: 700;
+    font-size: 1.2em;
+    display: block; /* 独立した行にする */
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+section {
+    background-color: var(--card-background);
+    padding: 30px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+section h2 {
+    color: var(--primary-color); /* セクション見出しも変更後のプライマリーカラーに合わせる */
+    font-size: 2em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+section p {
+    margin-bottom: 15px;
+}
+
+/* コードブロック */
+pre {
+    background-color: var(--code-background);
+    color: var(--code-text);
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto; /* 横スクロールを可能に */
+    margin-bottom: 20px;
+}
+
+code {
+    font-family: 'Roboto Mono', monospace; /* プログラミング用フォント */
+    font-size: 0.9em;
+}
+
+/* インラインコード */
+p code {
+    background-color: rgba(var(--primary-color), 0.1); /* 変更後のプライマリーカラーの透明度付き */
+    color: var(--primary-color); /* 変更後のプライマリーカラー */
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+/* 新しい強調スタイル */
+.highlight-key-concept {
+    font-weight: 700;
+    color: var(--highlight-blue); /* 重要な概念 */
+}
+
+.highlight-danger {
+    font-weight: 700;
+    color: var(--highlight-red); /* 警告や問題点 */
+}
+
+.highlight-strong {
+    font-weight: 700;
+    color: var(--highlight-green); /* ポジティブな強調 */
+}
+
+.highlight-info {
+    font-weight: 700;
+    color: #17a2b8; /* 情報の強調 */
+}
+
+.highlight-success {
+    font-weight: 700;
+    color: var(--highlight-green); /* 成功や肯定的な要素 */
+}
+
+.highlight-code {
+    font-family: 'Roboto Mono', monospace;
+    background-color: #f0f0f0;
+    color: #d63384; /* コード内の強調 */
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+
+/* リスト */
+ul, ol {
+    margin-bottom: 20px;
+    padding-left: 20px;
+}
+
+ul li, ol li {
+    margin-bottom: 8px;
+}
+
+/* リンク */
+a {
+    color: var(--primary-color); /* リンクの色も変更後のプライマリーカラーに合わせる */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #0056b3; /* ホバー時の色 (これは青のままでも良いか、プライマリーカラーに合わせるか調整) */
+    text-decoration: underline;
+}
+
+/* 画像 */
+.section-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 25px auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* フッター */
+footer {
+    background-color: var(--secondary-color);
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: auto; /* コンテンツが少ない場合でも下部に固定 */
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+}
+
+footer p {
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 1024px) {
+    /* サイドバーとメインコンテンツの切り替え */
+    .content-wrapper {
+        flex-direction: column; /* 縦並びにする */
+    }
+
+    .side-nav {
+        position: static; /* 固定を解除 */
+        width: 100%; /* 幅をフルにする */
+        height: auto; /* 高さも自動に */
+        border-right: none;
+        border-bottom: 1px solid var(--border-color); /* 下線を追加 */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        padding: 15px 0;
+        overflow-y: visible; /* スクロールバーは不要に */
+    }
+
+    .side-nav h2 {
+        margin-bottom: 10px;
+    }
+
+    .side-nav ul {
+        display: flex; /* 横並びにする */
+        flex-wrap: wrap; /* 小さい画面で折り返す */
+        justify-content: center;
+    }
+
+    .side-nav ul li {
+        margin: 5px 10px; /* 各項目間の余白 */
+    }
+
+    .side-nav ul li a {
+        padding: 8px 15px;
+        transform: none; /* ホバーエフェクトを解除 */
+        box-shadow: none;
+        border-left: none; /* ホバー時のボーダーを解除 */
+        border-bottom: none; /* 横並び時は下線なし */
+        border: 1px solid var(--border-color); /* 通常のボタン風にする */
+        background-color: var(--card-background);
+        color: var(--text-color);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .side-nav ul li a:hover {
+        background-color: var(--primary-color); /* 変更後のプライマリーカラー */
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .main-content {
+        padding-left: 20px; /* PC版と同じパディング */
+        padding-right: 20px;
+    }
+
+    header h1 {
+        font-size: 2em;
+    }
+
+    .header-logo {
+        height: calc(1em * 1.5); /* レスポンシブ調整でも1.5倍に */
+    }
+
+    header p {
+        font-size: 1em;
+    }
+
+    section {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    section h2 {
+        font-size: 1.7em;
+    }
+
+    pre {
+        padding: 10px;
+        font-size: 0.85em;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.8em;
+    }
+    
+    .header-logo {
+        height: calc(0.9em * 1.5); /* レスポンシブ調整でも1.5倍に */
+    }
+
+    header p {
+        font-size: 0.9em;
+    }
+
+    section h2 {
+        font-size: 1.5em;
+    }
+
+    pre {
+        font-size: 0.8em;
+    }
+
+    .container {
+        padding: 0 10px; /* スマートフォンでは左右パディングを狭める */
+    }
+
+    .main-content {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}

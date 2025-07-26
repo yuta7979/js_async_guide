@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript非同期処理の徹底解説：Promiseとasync/await</title>
+    <link rel="stylesheet" href="main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><img src="images/java.jpg" alt="JavaScriptロゴ" class="header-logo">JavaScript非同期処理の徹底解説</h1>
+            <p>Promiseとasync/awaitでモダンな非同期コードを書く</p>
+        </div>
+    </header>
+
+    <div class="content-wrapper">
+        <nav class="side-nav">
+            <h2>目次</h2>
+            <ul>
+                <li><a href="#introduction-section">はじめに</a></li>
+                <li><a href="#why-async">1. なぜ非同期処理が必要なのか？</a></li>
+                <li><a href="#callbacks-problem">2. コールバック地獄とその問題点</a></li>
+                <li><a href="#promise">3. Promiseによる非同期処理の改善</a></li>
+                <li><a href="#async-await">4. async/awaitによる非同期処理のさらなる進化</a></li>
+                <li><a href="#conclusion">5. まとめと応用</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <section id="introduction-section">
+                <h2 id="introduction-heading">はじめに</h2>
+                <p class="intro-text">
+                    <span class="highlight-intro">「あれ、ブラウザが固まっちゃった…？」</span><br>
+                    現代のウェブアプリは、たくさんの処理を同時にこなす必要がありますよね！JavaScriptは基本、ひとつずつ順番に仕事をする働き者ですが、これだと時間のかかる処理（データの読み込みとか）でページがフリーズしちゃうことも。
+                    でも大丈夫！このページでは、JavaScriptの<strong>非同期処理</strong>がなぜ必要で、どのように進化してきたのかを徹底解説します。昔ながらの<strong>コールバック地獄</strong>から、モダンな<strong>Promise</strong>、そして今や定番の<strong>async/await</strong>まで、具体的なコード例を交えて楽しく学びましょう。
+                </p>
+            </section>
+
+            <section id="why-async">
+                <h2 id="why-async-heading">1. なぜ非同期処理が必要なのか？</h2>
+                <p>JavaScriptは基本的に<span class="highlight-key-concept">シングルスレッド</span>で動作します。これは、一度に一つの処理しか実行できないことを意味します。しかし、ネットワークからのデータ取得やファイルの読み書きなど、時間のかかる処理を実行する際、メインスレッドが<span class="highlight-danger">ブロック</span>されてしまうと、ユーザーインターフェースが固まったり、アプリケーションが応答しなくなったりする問題が発生します。</p>
+                <p><strong>非同期処理</strong>は、時間のかかるタスクをバックグラウンドで実行し、その間もメインスレッドを解放しておくことで、アプリケーションの<strong>応答性</strong>を保つための重要なメカニズムです。これにより、ユーザーはスムーズに操作を続けることができます。</p>
+                <img src="images/Hidouki.jpg" alt="非同期処理の概念図" class="section-image">
+                <p>例えば、APIから大量のデータをフェッチする際に、非同期処理がなければ、データが全てダウンロードされるまでブラウザがフリーズしてしまうでしょう。非同期処理を用いることで、データ取得中にローディングアニメーションを表示したり、他のUI操作を可能にしたりすることができます。</p>
+            </section>
+
+            <section id="callbacks-problem">
+                <h2 id="callbacks-problem-heading">2. コールバック地獄とその問題点</h2>
+                <p>非同期処理の初期のJavaScriptでは、<span class="highlight-key-concept">コールバック関数</span>が主要な手段でした。ある処理が完了した後に実行される関数を引数として渡す方法です。</p>
+                <pre><code class="language-js">
+function fetchData(callback) {
+    setTimeout(() => {
+        const data = "データA";
+        callback(data);
+    }, 1000);
+}
+
+function processData(data, callback) {
+    setTimeout(() => {
+        const processedData = data.toUpperCase();
+        callback(processedData);
+    }, 500);
+}
+
+fetchData(function(dataA) {
+    console.log(dataA); // データA
+    processData(dataA, function(dataB) {
+        console.log(dataB); // データAを大文字にしたもの
+        // さらに別の非同期処理...
+        // callback(result);
+    });
+});
+                </code></pre>
+                <p>一見シンプルに見えますが、非同期処理が複数連鎖すると、ネストが深くなり、コードの可読性やメンテナンス性が著しく低下します。これは<span class="highlight-danger">「コールバック地獄 (Callback Hell)」</span>と呼ばれ、開発者を悩ませる大きな問題でした。</p>
+                <ul>
+                    <li>コードのネストが深くなる</li>
+                    <li>エラーハンドリングが複雑になる</li>
+                    <li>処理の流れが追いづらくなる</li>
+                </ul>
+            </section>
+
+            <section id="promise">
+                <h2 id="promise-heading">3. Promiseによる非同期処理の改善</h2>
+                <p><strong>Promise (プロミス)</strong>は、非同期処理の最終的な完了（または失敗）と、その結果の値を表現するオブジェクトです。これにより、コールバック地獄の問題を解決し、よりクリーンで管理しやすい非同期コードを書くことができます。</p>
+                <h3>Promiseの状態</h3>
+                <ol>
+                    <li><span class="highlight-info">pending (保留中)</span>: 初期状態。成功も失敗もしていない。</li>
+                    <li><span class="highlight-success">fulfilled (成功)</span>: 処理が成功し、結果の値が利用可能になった状態。</li>
+                    <li><span class="highlight-danger">rejected (失敗)</span>: 処理が失敗し、エラーが利用可能になった状態。</li>
+                </ol>
+                <h3>Promiseの基本的な使い方</h3>
+                <p>Promiseは <span class="highlight-code">new Promise()</span> コンストラクタで作成し、非同期処理の結果に応じて <span class="highlight-success">resolve</span> (成功) または <span class="highlight-danger">reject</span> (失敗) を呼び出します。結果を受け取る側は <span class="highlight-code">.then()</span> や <span class="highlight-code">.catch()</span> を使います。</p>
+                <pre><code class="language-js">
+function asyncOperation(value) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (value > 0) {
+                resolve(`成功: 値は ${value}`);
+            } else {
+                reject(new Error("失敗: 値は0以下です"));
+            }
+        }, 1500);
+    });
+}
+
+asyncOperation(10)
+    .then(result => {
+        console.log(result); // 成功: 値は 10
+    })
+    .catch(error => {
+        console.error(error.message);
+    });
+
+asyncOperation(-5)
+    .then(result => {
+        console.log(result);
+    })
+    .catch(error => {
+        console.error(error.message); // 失敗: 値は0以下です
+    });
+                </code></pre>
+                <h3>Promiseチェーン</h3>
+                <p><span class="highlight-code">.then()</span> メソッドは新しいPromiseを返すため、複数の非同期処理を連続して実行する<strong>Promiseチェーン</strong>を構築できます。これにより、コールバック地獄を解消し、処理の流れを順序立てて記述できるようになります。</p>
+                <pre><code class="language-js">
+fetch('https://jsonplaceholder.typicode.com/posts/1')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('ネットワーク応答が不正です。');
+        }
+        return response.json(); // JSON形式でパース
+    })
+    .then(data => {
+        console.log('取得したデータ:', data);
+        return fetch(`https://jsonplaceholder.typicode.com/users/${data.userId}`);
+    })
+    .then(response => response.json())
+    .then(user => {
+        console.log('ユーザー情報:', user);
+    })
+    .catch(error => {
+        console.error('エラーが発生しました:', error);
+    });
+                </code></pre>
+                </section>
+
+            <section id="async-await">
+                <h2 id="async-await-heading">4. async/awaitによる非同期処理のさらなる進化</h2>
+                <p><strong>async/await (アシィンク/アウェイト)</strong> は、Promiseの上に構築された構文シュガーであり、非同期コードをまるで同期コードのように、より直感的かつ簡潔に記述できるようにします。ES2017で導入されました。</p>
+                <h3>async 関数</h3>
+                <p>関数定義の前に <span class="highlight-code">async</span> キーワードを付けると、その関数は必ずPromiseを返します。関数内でPromiseを返さなくても、JavaScriptが自動的に返り値をPromiseでラップします。</p>
+                <pre><code class="language-js">
+async function greet() {
+    return "Hello, async/await!";
+}
+
+greet().then(message => console.log(message)); // Hello, async/await!
+
+async function greetError() {
+    throw new Error("Something went wrong!");
+}
+
+greetError().catch(error => console.error(error.message)); // Something went wrong!
+                </code></pre>
+                <h3>await キーワード</h3>
+                <p><span class="highlight-code">await</span> キーワードは <span class="highlight-code">async</span> 関数内でしか使用できません。<span class="highlight-key-concept">Promiseの解決</span>（fulfilled）または拒否（rejected）を待ち、その結果を返します。これにより、非同期処理のチェーンを平坦化し、可読性を劇的に向上させます。</p>
+                <pre><code class="language-js">
+async function fetchDataAndUser() {
+    try {
+        const postResponse = await fetch('https://jsonplaceholder.typicode.com/posts/1');
+        if (!postResponse.ok) {
+            throw new Error(`HTTP error! status: ${postResponse.status}`);
+        }
+        const post = await postResponse.json();
+        console.log('取得した投稿データ:', post);
+
+        const userResponse = await fetch(`https://jsonplaceholder.typicode.com/users/${post.userId}`);
+        if (!userResponse.ok) {
+            throw new Error(`HTTP error! status: ${userResponse.status}`);
+        }
+        const user = await userResponse.json();
+        console.log('取得したユーザー情報:', user);
+
+    } catch (error) {
+        console.error('データの取得中にエラーが発生しました:', error);
+    }
+}
+
+fetchDataAndUser();
+                </code></pre>
+                <p><strong>async/await</strong> を使用することで、Promiseチェーンよりもさらに線形的にコードを記述でき、非同期処理のロジックが格段に理解しやすくなります。</p>
+                <h3>エラーハンドリング</h3>
+                <p><strong>async/await</strong> では、同期コードと同じように <span class="highlight-code">try...catch</span> ブロックを使用してエラーをハンドリングできます。</p>
+            </section>
+
+            <section id="conclusion">
+                <h2 id="conclusion-heading">5. まとめと応用</h2>
+                <p>JavaScriptの非同期処理は、ウェブアプリケーションの<span class="highlight-success">応答性</span>と<span class="highlight-success">ユーザー体験</span>を向上させるために不可欠な技術です。コールバック関数からPromiseへ、そしてasync/awaitへと進化を遂げ、より効率的かつ読みやすいコード記述が可能になりました。</p>
+                <ul>
+                    <li>外部APIとの通信 (データ取得、送信)</li>
+                    <li>ファイルの読み書き、データベース操作</li>
+                    <li>タイマー処理やアニメーション</li>
+                    <li>UIイベント処理の遅延実行</li>
+                </ul>
+                <p>さらに学習を深めたい場合は、以下のサイトも参照してください。</p>
+                <ul>
+                    <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise" target="_blank" rel="noopener noreferrer">MDN Web Docs - Promise</a></li>
+                    <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/async_function" target="_blank" rel="noopener noreferrer">MDN Web Docs - async function</a></li>
+                </ul>
+                <p>これらの知識は、React, Vue, Angularなどのフレームワークを用いた開発や、Node.jsを用いたバックエンド開発においても非常に重要です。ここで深く理解しておきましょう。</p>
+            </section>
+        </main>
+    </div>
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 JavaScript Async Guide. All rights reserved.</p>
+            <p>本コンテンツの作成時間：約 10 時間</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
